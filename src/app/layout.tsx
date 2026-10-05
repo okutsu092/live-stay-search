@@ -12,10 +12,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: 'ライブ×ホテルサーチ｜ライブ・イベント会場周辺のホテル検索',
+export const metadata: Metadata = {
+  metadataBase: new URL('https://live-stay-search.vercel.app'),
+
+  title: {
+    default: 'ライブ会場ホテルサーチ',
+    template: '%s｜ライブ会場ホテルサーチ',
+  },
+
   description:
-    'ライブ・イベント会場から近いホテルを検索できます。会場周辺の宿泊施設を距離から探せます。',
+    'ライブ・コンサート・イベント会場から近いホテルを検索。会場と検索範囲を選び、周辺の宿泊施設を距離で探せます。',
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
