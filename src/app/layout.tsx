@@ -13,6 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  verification: {
+    google: 'L1lTxu3tdNBbFFtJ8XPOU0NEFNP-0HGyFBdww3JeipQ',
+  },
+
   metadataBase: new URL('https://live-stay-search.vercel.app'),
 
   title: {
