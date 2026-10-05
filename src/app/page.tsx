@@ -63,14 +63,14 @@ export default async function HomePage({
 
 
   const matchedVenue = venues.find(
-    (venue) => venue.name === requestedVenue
-  )
+(venue) => venue.name === requestedVenue
+)
 
-  if (matchedVenue) {
-    redirect(`/venues/${matchedVenue.id}`)
-  }
+if (matchedVenue) {
+redirect(`/venues/${matchedVenue.id}`)
+}
 
-  const selectedVenue = matchedVenue?.name ?? venues[0]?.name ?? ''
+const selectedVenue = venues[0]?.name ?? ''
   const initialRadius = 3000
 
 
