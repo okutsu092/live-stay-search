@@ -48,7 +48,7 @@ export default async function HomePage({
 
   const { data: venueData, error: venueError } = await supabase
     .from('venues')
-    .select('id, name')
+    .select('id, name, prefecture, address')
     .order('name')
     .returns<Venue[]>()
 

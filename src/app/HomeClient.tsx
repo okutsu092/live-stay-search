@@ -3,13 +3,15 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { groupVenuesByPrefecture } from '@/lib/group-venues'
 
 
 export type Venue = {
   id: number
   name: string
+  prefecture: string | null
+  address: string | null
 }
-
 
 export type Hotel = {
   hotel_id: number
@@ -31,6 +33,8 @@ type HomeClientProps = {
 }
 
 
+
+
 export default function HomeClient({
   venues,
   initialSelectedVenue,
@@ -50,6 +54,7 @@ export default function HomeClient({
 
 
   const hotels = initialHotels
+  const venueGroups = groupVenuesByPrefecture(venues)
 
 
   function searchHotels(
@@ -211,11 +216,19 @@ function handleRadiusChange(nextRadius: number) {
     </option>
   )}
 
-  {venues.map((venue) => (
-    <option key={venue.id} value={venue.name}>
-      {venue.name}
-    </option>
-  ))}
+  {venueGroups.map((group) => (
+  <optgroup
+    key={group.prefecture}
+    label={group.prefecture}
+  >
+    {group.venues.map((venue) => (
+      <option key={venue.id} value={venue.name}>
+        {venue.name}
+      </option>
+    ))}
+  </optgroup>
+))}
+
 </select>
 
               </div>
@@ -343,6 +356,25 @@ function handleRadiusChange(nextRadius: number) {
                     <h3 className="mt-2 text-xl font-extrabold text-gray-900">
                       {hotel.hotel_name}
                     </h3>
+<div className="mt-3">
+  <p className="text-xs font-medium text-gray-500">
+    楽天トラベルでの最低料金
+  </p>
+
+  {hotel.price_min != null && hotel.price_min > 0 ? (
+    <p className="mt-1 text-xl font-extrabold text-indigo-600">
+      {hotel.price_min.toLocaleString('ja-JP')}
+      <span className="ml-1 text-sm font-bold">円〜</span>
+    </p>
+  ) : (
+    <p className="mt-1 text-sm text-gray-500">
+      料金情報なし
+    </p>
+  )}
+</div>
+
+
+                    
                   </div>
 
 

@@ -1,16 +1,11 @@
 import type { Metadata } from 'next'
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
-import HomeClient from '@/app/HomeClient'
-import type { Hotel, Venue } from '@/app/HomeClient'
+import HomeClient from '../../HomeClient'
+import type { Hotel, Venue } from '../../HomeClient'
 import { createPublicServerClient } from '@/lib/supabase-server'
 
-
 export const dynamic = 'force-dynamic'
-
-
-const baseUrl = 'https://live-stay-search.vercel.app'
-
 
 type VenuePageProps = {
   params: Promise<{
@@ -21,67 +16,58 @@ type VenuePageProps = {
   }>
 }
 
+// URLのIDに対応する会場を取得
+const getVenue = cache(async (id: string): Promise<Venue | null> => {
+  if (!/^\d+$/.test(id)) {
+    return null
+  }
 
-// 同一リクエスト内では、metadataと本文で取得結果を共有します。
-const getVenues = cache(async (): Promise<Venue[]> => {
+  const venueId = Number(id)
+
+  if (!Number.isSafeInteger(venueId) || venueId <= 0) {
+    return null
+  }
+
   const supabase = createPublicServerClient()
-
 
   const { data, error } = await supabase
     .from('venues')
-    .select('id, name')
-    .order('name')
+    .select('id, name, prefecture, address')
+    .eq('id', venueId)
+    .limit(1)
     .returns<Venue[]>()
 
-
   if (error) {
-    console.error('会場一覧の取得に失敗:', error.message)
+    console.error('会場情報の取得に失敗:', error.message)
     throw new Error('会場情報を取得できませんでした。')
   }
 
-
-  return data ?? []
+  return data?.[0] ?? null
 })
 
-
-async function getVenue(id: string) {
-  const venues = await getVenues()
-  const venue = venues.find((item) => String(item.id) === id)
-
+// 会場ごとのタイトル・説明・canonical
+export async function generateMetadata({
+  params,
+}: VenuePageProps): Promise<Metadata> {
+  const { id } = await params
+  const venue = await getVenue(id)
 
   if (!venue) {
     notFound()
   }
 
-
-  return { venue, venues }
-}
-
-
-export async function generateMetadata({
-  params,
-}: VenuePageProps): Promise<Metadata> {
-  const { id } = await params
-  const { venue } = await getVenue(id)
-
-
   return {
     title: {
-      absolute:
-        `${venue.name}周辺のホテル検索｜ライブ会場ホテルサーチ`,
+      absolute: `${venue.name}周辺のホテル検索｜ライブ会場ホテルサーチ`,
     },
-
-
     description:
-      `${venue.name}周辺のホテルを検索。会場から1km・3km・5km以内の宿泊施設を探せます。ライブやイベント参加時のホテル選びにご利用ください。`,
-
-
+      `${venue.name}周辺のホテルを検索。` +
+      '会場からの距離や楽天トラベルでの最低料金を確認して、宿泊施設を探せます。',
     alternates: {
-      canonical: `baseUrl/venues/{venue.id}`,
+      canonical: `https://live-stay-search.vercel.app/venues/${venue.id}`,
     },
   }
 }
-
 
 export default async function VenuePage({
   params,
@@ -90,59 +76,63 @@ export default async function VenuePage({
   const { id } = await params
   const query = await searchParams
 
+  const venue = await getVenue(id)
 
-  const { venue, venues } = await getVenue(id)
+  if (!venue) {
+    notFound()
+  }
 
-
-  const radiusValue = Array.isArray(query.radius)
+  // 検索範囲は1km・3km・5km。未指定や不正な値は3km
+  const radiusParam = Array.isArray(query.radius)
     ? query.radius[0]
     : query.radius
 
+  const requestedRadius = Number(radiusParam)
 
-  const requestedRadius = Number(radiusValue)
-
-
-  const radius = [1000, 3000, 5000].includes(requestedRadius)
+  const initialRadius = [1000, 3000, 5000].includes(requestedRadius)
     ? requestedRadius
     : 3000
 
-
   const supabase = createPublicServerClient()
 
+  // 選択リスト用の会場一覧
+  const { data: venueData, error: venueError } = await supabase
+    .from('venues')
+    .select('id, name, prefecture, address')
+    .order('name')
+    .returns<Venue[]>()
 
-  const { data, error } = await supabase.rpc(
-    'search_hotels_near_venue',
-    {
+  if (venueError) {
+    console.error('会場一覧の取得に失敗:', venueError.message)
+    throw new Error('会場一覧を取得できませんでした。')
+  }
+
+  // 選択した会場の周辺ホテル
+  const { data: hotelData, error: hotelError } = await supabase
+    .rpc('search_hotels_near_venue', {
       venue_name: venue.name,
-      radius_meters: radius,
-    }
-  )
+      radius_meters: initialRadius,
+    })
 
-
-  if (error) {
-    console.error('ホテル検索に失敗:', error.message)
+  if (hotelError) {
+    console.error('ホテル検索に失敗:', hotelError.message)
     throw new Error('ホテル情報を取得できませんでした。')
   }
 
-
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'ホテル検索の結果が配列ではありません。'
-    )
+  if (!Array.isArray(hotelData)) {
+    throw new Error('ホテル検索の結果が配列ではありません。')
   }
 
-
-  const hotels = data as Hotel[]
-
+  const initialHotels = hotelData as Hotel[]
 
   return (
     <HomeClient
-      key={`venue.id-{radius}`}
-      venues={venues}
+      key={`${venue.id}-${initialRadius}`}
+      venues={venueData ?? []}
       initialSelectedVenue={venue.name}
-      initialHotels={hotels}
-      initialRadius={radius}
-      isVenuePage
+      initialHotels={initialHotels}
+      initialRadius={initialRadius}
+      isVenuePage={true}
     />
   )
 }
