@@ -265,7 +265,7 @@ function searchHotels() {
 
 
       {/* Search Results */}
-{(isVenuePage || selectedVenue) && (
+{isVenuePage && (
   <section
     className="mx-auto max-w-6xl px-6 pb-20"
     aria-busy={loading}
@@ -320,17 +320,17 @@ function searchHotels() {
               現在、会場情報を準備しています。
             </p>
           </div>
-        ) : hotels.length === 0 ? (
-          <div className="rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-gray-100">
-            <div className="text-4xl">🏨</div>
-            <p className="mt-4 font-bold">
-              条件に合うホテルが見つかりませんでした。
-            </p>
-            <p className="mt-2 text-sm text-gray-500">
-              検索範囲を広げて、もう一度お試しください。
-            </p>
-          </div>
-        ) : (
+       ) : !loading && hotels.length === 0 ? (
+  <div className="rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-gray-100">
+    <div className="text-4xl">🏨</div>
+    <p className="mt-4 font-bold">
+      条件に合うホテルが見つかりませんでした。
+    </p>
+    <p className="mt-2 text-sm text-gray-500">
+      検索範囲を広げて、もう一度お試しください。
+    </p>
+  </div>
+) : (
           <div className="grid gap-5 md:grid-cols-2">
             {hotels.map((hotel) => (
               <article
