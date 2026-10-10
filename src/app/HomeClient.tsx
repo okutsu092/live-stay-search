@@ -51,8 +51,8 @@ export default function HomeClient({
 
 
   const [selectedVenue, setSelectedVenue] = useState(
-    initialSelectedVenue
-  )
+  isVenuePage ? initialSelectedVenue : ''
+)
   const [resultsVenue, setResultsVenue] = useState(initialSelectedVenue)
   const [radius, setRadius] = useState(initialRadius)
   const [error, setError] = useState('')
@@ -200,6 +200,8 @@ function searchHotels() {
   disabled={venues.length === 0}
   className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-gray-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100"
 >
+<option value="">会場を選択してください</option>
+
   {venues.length === 0 && (
     <option value="">
       登録されている会場がありません
@@ -263,15 +265,16 @@ function searchHotels() {
 
 
       {/* Search Results */}
-      <section
-        className="mx-auto max-w-6xl px-6 pb-20"
-        aria-busy={loading}
-      >
+{(isVenuePage || selectedVenue) && (
+  <section
+    className="mx-auto max-w-6xl px-6 pb-20"
+    aria-busy={loading}
+  >
         <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-bold text-indigo-600">
-              SEARCH RESULTS
-            </p>
+  会場から探す
+</p>
 
 
             <h2 className="mt-1 text-2xl font-black sm:text-3xl">
@@ -457,6 +460,7 @@ function searchHotels() {
           </div>
         )}
       </section>
+)}
 
 
       {/* Venue Links */}
