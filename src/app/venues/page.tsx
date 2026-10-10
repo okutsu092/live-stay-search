@@ -22,12 +22,12 @@ export const metadata: Metadata = {
   },
 }
 
-
 type Venue = {
   id: number
   name: string
+  prefecture: string | null
+  address: string | null
 }
-
 
 export default async function VenuesPage() {
   const supabase = createPublicServerClient()
@@ -35,7 +35,7 @@ export default async function VenuesPage() {
 
   const { data, error } = await supabase
     .from('venues')
-    .select('id, name')
+    .select('id, name, prefecture, address')    
     .order('name')
     .returns<Venue[]>()
 
