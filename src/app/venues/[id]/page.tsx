@@ -109,7 +109,7 @@ export default async function VenuePage({
 
   // 選択した会場の周辺ホテル
   const { data: hotelData, error: hotelError } = await supabase
-    .rpc('search_hotels_near_venue', {
+    .rpc('search_hotels_near_venue_with_reviews', {
       venue_name: venue.name,
       radius_meters: initialRadius,
     })

@@ -13,6 +13,7 @@ export type Venue = {
   address: string | null
 }
 
+
 export type Hotel = {
   hotel_id: number
   hotel_name: string
@@ -21,6 +22,9 @@ export type Hotel = {
   affiliate_url: string | null
   hotel_image_url: string | null
   distance_km: number
+  review_average: number | null
+  review_count: number | null
+  review_updated_at: string | null
 }
 
 
@@ -49,6 +53,7 @@ export default function HomeClient({
   const [selectedVenue, setSelectedVenue] = useState(
     initialSelectedVenue
   )
+  const [resultsVenue, setResultsVenue] = useState(initialSelectedVenue)
   const [radius, setRadius] = useState(initialRadius)
   const [error, setError] = useState('')
 
@@ -57,48 +62,35 @@ export default function HomeClient({
   const venueGroups = groupVenuesByPrefecture(venues)
 
 
-  function searchHotels(
-  venueName: string = selectedVenue,
-  searchRadius: number = radius
-) {
+
+function searchHotels() {
   const venue = venues.find(
-    (item) => item.name === venueName
+    (item) => item.name === selectedVenue
   )
 
-
-  if (!venue) {
+  if (!venue || loading) {
     return
   }
 
+  if (!venue || loading) {
+    return
+  }
 
   const destination =
-searchRadius === 3000
-? `/venues/${venue.id}`
-: `/venues/${venue.id}?radius=${searchRadius}`
-
-
-
+    radius === 3000
+      ? `/venues/${venue.id}`
+      : `/venues/${venue.id}?radius=${radius}`
 
   const currentUrl =
     window.location.pathname + window.location.search
-
 
   if (currentUrl === destination) {
     return
   }
 
-
-  window.location.assign(destination)
-}
-
-
-
-  function handleVenueChange(venueName: string) {
-  searchHotels(venueName, radius)
-}
-
-function handleRadiusChange(nextRadius: number) {
-  searchHotels(selectedVenue, nextRadius)
+  startTransition(() => {
+    router.push(destination)
+  })
 }
 
 
@@ -204,9 +196,7 @@ function handleRadiusChange(nextRadius: number) {
                 <select
   id="venue"
   value={selectedVenue}
-  onChange={(event) =>
-    handleVenueChange(event.target.value)
-  }
+  onChange={(event) => setSelectedVenue(event.target.value)}
   disabled={venues.length === 0}
   className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-gray-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100"
 >
@@ -246,9 +236,7 @@ function handleRadiusChange(nextRadius: number) {
                 <select
   id="radius"
   value={radius}
-  onChange={(event) =>
-    handleRadiusChange(Number(event.target.value))
-  }
+  onChange={(event) => setRadius(Number(event.target.value))}
   className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-gray-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100"
 >
   <option value={1000}>1km以内</option>
@@ -262,7 +250,7 @@ function handleRadiusChange(nextRadius: number) {
 
             <button
   type="button"
-  onClick={() => searchHotels(selectedVenue, radius)}
+  onClick={searchHotels}
   disabled={loading || !selectedVenue}
   className="mt-6 w-full rounded-2xl bg-indigo-600 px-6 py-4 text-base font-extrabold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-xl active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
 >
@@ -287,10 +275,10 @@ function handleRadiusChange(nextRadius: number) {
 
 
             <h2 className="mt-1 text-2xl font-black sm:text-3xl">
-              {selectedVenue
-                ? `${selectedVenue}周辺のホテル`
-                : '会場周辺のホテル'}
-            </h2>
+ {(isVenuePage ? initialSelectedVenue : resultsVenue)
+  ? `${isVenuePage ? initialSelectedVenue : resultsVenue}周辺のホテル`
+  : '会場周辺のホテル'}
+</h2>
           </div>
 
 
@@ -358,7 +346,7 @@ function handleRadiusChange(nextRadius: number) {
                     </h3>
 <div className="mt-3">
   <p className="text-xs font-medium text-gray-500">
-    楽天トラベルでの最低料金
+    楽天トラベルでの最低料金（目安）
   </p>
 
   {hotel.price_min != null && hotel.price_min > 0 ? (
@@ -372,6 +360,53 @@ function handleRadiusChange(nextRadius: number) {
     </p>
   )}
 </div>
+
+{/* 口コミ評価 */}
+<div className="mt-4">
+  {hotel.review_average != null ? (
+    <>
+      <div className="flex flex-wrap items-center gap-2">
+        <div
+          className="flex items-center text-xl leading-none"
+          aria-label={`5点満点中 ${hotel.review_average}点`}
+        >
+          {Array.from({ length: 5 }, (_, index) => (
+            <span
+              key={index}
+              className={
+                index < Math.round(hotel.review_average!)
+                  ? 'text-amber-400'
+                  : 'text-gray-300'
+              }
+            >
+              ★
+            </span>
+          ))}
+        </div>
+
+        <span className="font-bold text-gray-900">
+          {hotel.review_average.toFixed(1)}
+        </span>
+
+        {hotel.review_count != null && (
+          <span className="text-sm text-gray-500">
+            （口コミ {hotel.review_count.toLocaleString('ja-JP')}件）
+          </span>
+        )}
+      </div>
+
+      {hotel.review_updated_at && (
+        <p className="mt-1 text-xs text-gray-400">
+          口コミ更新日：
+          {hotel.review_updated_at.replace(/-/g, '/')}
+        </p>
+      )}
+    </>
+  ) : (
+    <p className="text-sm text-gray-500">口コミ情報なし</p>
+  )}
+</div>
+
 
 
                     
