@@ -2,8 +2,8 @@
 import type { Metadata } from 'next'
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
-import HomeClient from '../../HomeClient'
-import type { Hotel, Venue } from '../../HomeClient'
+import VenueDetailClient from './VenueDetailClient'
+import type { Hotel, Venue } from './VenueDetailClient'
 import { createPublicServerClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
@@ -19,7 +19,6 @@ type VenuePageProps = {
   }>
 }
 
-// URLのIDに対応する会場を取得
 const getVenue = cache(async (id: string): Promise<Venue | null> => {
   if (!/^\d+$/.test(id)) {
     return null
@@ -48,7 +47,6 @@ const getVenue = cache(async (id: string): Promise<Venue | null> => {
   return data?.[0] ?? null
 })
 
-// 会場ごとのタイトル・説明・canonical
 export async function generateMetadata({
   params,
 }: VenuePageProps): Promise<Metadata> {
@@ -78,27 +76,23 @@ export default async function VenuePage({
 }: VenuePageProps) {
   const { id } = await params
   const query = await searchParams
-
   const venue = await getVenue(id)
 
   if (!venue) {
     notFound()
   }
 
-  // 検索範囲は1km・3km・5km。未指定や不正な値は3km
   const radiusParam = Array.isArray(query.radius)
     ? query.radius[0]
     : query.radius
 
   const requestedRadius = Number(radiusParam)
-
   const initialRadius = [1000, 3000, 5000].includes(requestedRadius)
     ? requestedRadius
     : 5000
 
   const supabase = createPublicServerClient()
 
-  // 選択リスト用の会場一覧
   const { data: venueData, error: venueError } = await supabase
     .from('venues')
     .select('id, name, prefecture, address')
@@ -110,7 +104,6 @@ export default async function VenuePage({
     throw new Error('会場一覧を取得できませんでした。')
   }
 
-  // 選択した会場の周辺ホテル
   const { data: hotelData, error: hotelError } = await supabase
     .rpc('search_hotels_near_venue_with_reviews', {
       venue_name: venue.name,
@@ -135,9 +128,6 @@ export default async function VenuePage({
         )[0]
       : null
 
-
-
-  // パンくずリストの構造化データ
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -163,14 +153,11 @@ export default async function VenuePage({
     ],
   }
 
-  // JSON-LD内にHTMLとして解釈される文字が入らないようにする
   const breadcrumbJsonLdString = JSON.stringify(breadcrumbJsonLd).replace(
     /</g,
     '\\u003c'
   )
 
-
-  // FAQの構造化データ
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -204,18 +191,17 @@ export default async function VenuePage({
 
   const faqJsonLdString = JSON.stringify(faqJsonLd).replace(
     /</g,
-    '\u003c'
+    '\\u003c'
   )
 
   return (
     <>
-            <script
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: breadcrumbJsonLdString,
         }}
       />
-
 
       <script
         type="application/ld+json"
@@ -224,25 +210,21 @@ export default async function VenuePage({
         }}
       />
 
-      
-
-      <HomeClient
+      <VenueDetailClient
         key={`${venue.id}-${initialRadius}`}
         venues={venueData ?? []}
         initialSelectedVenue={venue.name}
         initialHotels={initialHotels}
         initialRadius={initialRadius}
-        isVenuePage={true}
       />
 
-            <section className="mx-auto w-full max-w-7xl px-4 py-8">
+      {/* 会場別FAQ：画面上にも表示 */}
+      <section
+        id="venue-faq"
+        className="scroll-mt-24 mx-auto w-full max-w-7xl px-4 py-8"
+      >
         <div className="space-y-6">
-
-          {/* よくある質問 */}
-          <div
-            id="venue-faq"
-            className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"
-          >
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
             <h2 className="text-xl font-bold text-slate-900">
               {venue.name}周辺のホテルに関するよくある質問
             </h2>
@@ -304,18 +286,24 @@ export default async function VenuePage({
             </div>
           </div>
 
-          {/* 料金に関する注意 */}
           <div className="rounded-2xl bg-slate-50 p-5 text-sm leading-7 text-slate-600">
             <p>
               ※ 表示される宿泊料金は最低料金の目安です。
               宿泊日・人数・プラン・空室状況によって料金は変動します。
-              実際の宿泊料金や空室状況は、
-              各予約サイトで最新情報をご確認ください。
+              実際の宿泊料金や空室状況は、各予約サイトで最新情報をご確認ください。
             </p>
           </div>
-
         </div>
       </section>
+      <footer className="bg-slate-950 px-4 py-8 text-center text-sm text-slate-400">
+  <a
+    href="/"
+    className="font-bold text-white transition hover:text-sky-300"
+  >
+    ライブ会場ホテルサーチ
+  </a>
+  <p className="mt-3">© ライブ会場ホテルサーチ</p>
+</footer>
     </>
   )
 }
