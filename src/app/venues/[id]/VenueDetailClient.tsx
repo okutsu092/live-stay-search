@@ -146,36 +146,38 @@ export default function VenueDetailClient({
     <main className="min-h-screen bg-slate-50 text-slate-900">
       {/* 共通ヘッダー */}
       <header className="sticky top-0 z-50 border-b border-white/70 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <a href="/" className="shrink-0 text-lg font-extrabold tracking-tight sm:text-xl">
-            🎵 ライブ会場ホテルサーチ
-          </a>
+  <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" className="text-xl font-extrabold tracking-tight">
+      🎵 ライブ会場ホテルサーチ
+    </a>
 
-          <nav
-            aria-label="メインナビゲーション"
-            className="flex flex-wrap items-center justify-end gap-1 sm:gap-2"
-          >
-            <a
-              href="/#hotel-search"
-              className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-3 py-2 text-xs font-extrabold text-white shadow-md transition hover:bg-indigo-700 sm:px-5 sm:py-3 sm:text-sm"
-            >
-              🔎 ホテル検索
-            </a>
-            <a
-              href="/venues"
-              className="rounded-full px-2 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 sm:px-4 sm:py-2.5 sm:text-sm"
-            >
-              会場一覧
-            </a>
-            <a
-              href="/faq"
-              className="hidden rounded-full px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:inline-flex"
-            >
-              よくある質問
-            </a>
-          </nav>
-        </div>
-      </header>
+    <nav
+      aria-label="メインナビゲーション"
+      className="flex flex-wrap items-center justify-end gap-2"
+    >
+      <a
+        href="/#hotel-search"
+        className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+      >
+        🔎 ホテル検索
+      </a>
+
+      <a
+        href="/venues"
+        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        ライブ・イベント会場一覧
+      </a>
+
+      <a
+        href="/faq"
+        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        よくある質問
+      </a>
+    </nav>
+  </div>
+</header>
 
       {/* パンくずリスト */}
       <nav aria-label="パンくずリスト" className="border-b border-slate-100 bg-white">
