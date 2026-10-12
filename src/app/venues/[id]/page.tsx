@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next'
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
@@ -6,6 +7,8 @@ import type { Hotel, Venue } from '../../HomeClient'
 import { createPublicServerClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
+
+const BASE_URL = 'https://live-stay-search.vercel.app'
 
 type VenuePageProps = {
   params: Promise<{
@@ -64,7 +67,7 @@ export async function generateMetadata({
       `${venue.name}周辺のホテルを検索。` +
       '会場からの距離や楽天トラベルでの最低料金を確認して、宿泊施設を探せます。',
     alternates: {
-      canonical: `https://live-stay-search.vercel.app/venues/${venue.id}`,
+      canonical: `${BASE_URL}/venues/${venue.id}`,
     },
   }
 }
@@ -125,14 +128,87 @@ export default async function VenuePage({
 
   const initialHotels = hotelData as Hotel[]
 
+  // パンくずリストの構造化データ
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'トップページ',
+        item: BASE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '会場一覧',
+        item: `${BASE_URL}/venues`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: venue.name,
+        item: `${BASE_URL}/venues/${venue.id}`,
+      },
+    ],
+  }
+
+  // JSON-LD内にHTMLとして解釈される文字が入らないようにする
+  const breadcrumbJsonLdString = JSON.stringify(breadcrumbJsonLd).replace(
+    /</g,
+    '\\u003c'
+  )
+
   return (
-    <HomeClient
-      key={`${venue.id}-${initialRadius}`}
-      venues={venueData ?? []}
-      initialSelectedVenue={venue.name}
-      initialHotels={initialHotels}
-      initialRadius={initialRadius}
-      isVenuePage={true}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: breadcrumbJsonLdString,
+        }}
+      />
+
+      <nav
+        aria-label="パンくずリスト"
+        className="mx-auto w-full max-w-7xl px-4 pt-4 text-sm text-slate-600"
+      >
+        <ol className="flex flex-wrap items-center gap-2">
+          <li>
+            <a
+              href="/"
+              className="underline-offset-4 hover:underline"
+            >
+              トップページ
+            </a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <a
+              href="/venues"
+              className="underline-offset-4 hover:underline"
+            >
+              会場一覧
+            </a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li
+            aria-current="page"
+            className="font-medium text-slate-900"
+          >
+            {venue.name}
+          </li>
+        </ol>
+      </nav>
+
+      <HomeClient
+        key={`${venue.id}-${initialRadius}`}
+        venues={venueData ?? []}
+        initialSelectedVenue={venue.name}
+        initialHotels={initialHotels}
+        initialRadius={initialRadius}
+        isVenuePage={true}
+      />
+    </>
   )
 }
