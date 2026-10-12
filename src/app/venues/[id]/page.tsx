@@ -201,6 +201,37 @@ export default async function VenuePage({
         </ol>
       </nav>
 
+      <section className="mx-auto w-full max-w-7xl px-4 py-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+          <h2 className="text-xl font-bold text-slate-900">
+            {venue.name}周辺のホテル情報
+          </h2>
+
+          {(venue.prefecture || venue.address) && (
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              所在地：
+              {[venue.prefecture, venue.address]
+                .filter(Boolean)
+                .join(' ')}
+            </p>
+          )}
+
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            {venue.name}でのライブやイベントに参加する際は、
+            会場からの距離を参考に宿泊先を探せます。
+            このページでは、会場周辺のホテルについて、
+            口コミ評価・口コミ件数・最低料金の目安を比較できます。
+          </p>
+
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            検索範囲は1km・3km・5kmから選べます。
+            会場に近いホテルを探したい場合は狭い範囲から、
+            選択肢を増やしたい場合は広い範囲から確認してください。
+            料金や空室状況は予約先で最新情報をご確認ください。
+          </p>
+        </div>
+      </section>
+
       <HomeClient
         key={`${venue.id}-${initialRadius}`}
         venues={venueData ?? []}
