@@ -162,7 +162,7 @@ export default async function VenuePage({
 
   return (
     <>
-      <script
+            <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: breadcrumbJsonLdString,
@@ -175,10 +175,7 @@ export default async function VenuePage({
       >
         <ol className="flex flex-wrap items-center gap-2">
           <li>
-            <a
-              href="/"
-              className="underline-offset-4 hover:underline"
-            >
+            <a href="/" className="underline-offset-4 hover:underline">
               トップページ
             </a>
           </li>
@@ -192,14 +189,20 @@ export default async function VenuePage({
             </a>
           </li>
           <li aria-hidden="true">/</li>
-          <li
-            aria-current="page"
-            className="font-medium text-slate-900"
-          >
+          <li aria-current="page" className="font-medium text-slate-900">
             {venue.name}
           </li>
         </ol>
       </nav>
+
+      <HomeClient
+        key={`${venue.id}-${initialRadius}`}
+        venues={venueData ?? []}
+        initialSelectedVenue={venue.name}
+        initialHotels={initialHotels}
+        initialRadius={initialRadius}
+        isVenuePage={true}
+      />
 
       <section className="mx-auto w-full max-w-7xl px-4 py-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
@@ -231,15 +234,6 @@ export default async function VenuePage({
           </p>
         </div>
       </section>
-
-      <HomeClient
-        key={`${venue.id}-${initialRadius}`}
-        venues={venueData ?? []}
-        initialSelectedVenue={venue.name}
-        initialHotels={initialHotels}
-        initialRadius={initialRadius}
-        isVenuePage={true}
-      />
     </>
   )
 }
