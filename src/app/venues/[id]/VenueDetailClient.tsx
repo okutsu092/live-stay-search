@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useMemo, useState, useTransition } from 'react'
@@ -33,6 +32,8 @@ type Props = {
 }
 
 type SortMode = 'distance' | 'price' | 'rating'
+
+const VENUE_HERO_IMAGES: Record<number, string> = {}
 
 function ReviewStars({ rating }: { rating: number }) {
   const safeRating = Math.max(0, Math.min(5, rating))
@@ -75,9 +76,14 @@ export default function VenueDetailClient({
   const [sortMode, setSortMode] = useState<SortMode>('distance')
 
   const venueGroups = groupVenuesByPrefecture(venues)
+
   const currentVenue = venues.find(
     (venue) => venue.name === initialSelectedVenue
   )
+
+  const venueHeroImage =
+    (currentVenue && VENUE_HERO_IMAGES[currentVenue.id]) ||
+    '/hero-concert.png'
 
   const sortedHotels = useMemo(() => {
     const result = [...initialHotels]
@@ -144,51 +150,95 @@ export default function VenueDetailClient({
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      {/* 共通ヘッダー */}
+      {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white/70 bg-white/95 backdrop-blur">
-  <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-    <a href="/" className="text-xl font-extrabold tracking-tight">
-      🎵 ライブ会場ホテルサーチ
-    </a>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <a
+            href="/"
+            className="min-w-0 shrink text-base font-extrabold tracking-tight sm:text-xl"
+          >
+            <span className="sm:hidden">🎵 ライブ会場ホテル</span>
+            <span className="hidden sm:inline">🎵 ライブ会場ホテルサーチ</span>
+          </a>
 
-    <nav
-      aria-label="メインナビゲーション"
-      className="flex flex-wrap items-center justify-end gap-2"
-    >
-      <a
-        href="/#hotel-search"
-        className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+          {/* Desktop navigation */}
+          <nav
+            aria-label="メインナビゲーション"
+            className="hidden items-center justify-end gap-2 md:flex"
+          >
+            <a
+              href="#hotel-search"
+              className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+            >
+              🔎 ホテル検索
+            </a>
+
+            <a
+              href="/venues"
+              className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+            >
+              ライブ・イベント会場一覧
+            </a>
+
+            <a
+              href="/faq"
+              className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+            >
+              よくある質問
+            </a>
+          </nav>
+
+          {/* Mobile navigation */}
+          <div className="flex shrink-0 items-center gap-2 md:hidden">
+            <a
+              href="#hotel-search"
+              className="inline-flex min-h-10 items-center justify-center rounded-full bg-indigo-600 px-3 py-2 text-xs font-extrabold text-white shadow-sm"
+            >
+              🔎 ホテル検索
+            </a>
+
+            <details className="relative">
+              <summary
+                aria-label="メニューを開く"
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white text-xl font-bold text-slate-700 shadow-sm"
+              >
+                ☰
+              </summary>
+
+              <div className="absolute right-0 top-12 z-[60] w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                <a
+                  href="/venues"
+                  className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  ライブ・イベント会場一覧
+                </a>
+
+                <a
+                  href="/faq"
+                  className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  よくある質問
+                </a>
+              </div>
+            </details>
+          </div>
+        </div>
+      </header>
+
+      <nav
+        aria-label="パンくずリスト"
+        className="border-b border-slate-100 bg-white"
       >
-        🔎 ホテル検索
-      </a>
-
-      <a
-        href="/venues"
-        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-      >
-        ライブ・イベント会場一覧
-      </a>
-
-      <a
-        href="/faq"
-        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-      >
-        よくある質問
-      </a>
-    </nav>
-  </div>
-</header>
-
-      {/* パンくずリスト */}
-      <nav aria-label="パンくずリスト" className="border-b border-slate-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
           <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
             <li>
-              <a href="/" className="hover:text-indigo-600">トップページ</a>
+              <a href="/" className="transition hover:text-indigo-600">
+                トップページ
+              </a>
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <a href="/venues" className="hover:text-indigo-600">
+              <a href="/venues" className="transition hover:text-indigo-600">
                 ライブ・イベント会場一覧
               </a>
             </li>
@@ -200,113 +250,137 @@ export default function VenueDetailClient({
         </div>
       </nav>
 
-      {/* 会場Hero */}
       <section className="relative isolate overflow-hidden bg-slate-950">
         <div
           className="absolute inset-0 -z-20 bg-cover bg-center"
-          style={{ backgroundImage: "url('/hero-concert.png')" }}
+          style={{ backgroundImage: `url('${venueHeroImage}')` }}
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-blue-950/45" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-slate-950/25" />
 
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-          <p className="inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
-            ライブ・イベント遠征のホテル探し
-          </p>
+        <div className="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-14">
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(420px,520px)] lg:gap-12">
+            <div className="max-w-3xl">
+              <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
+                <span aria-hidden="true">♪</span>
+                ライブ・イベント遠征のホテル探し
+              </p>
 
-          <h1 className="mt-5 max-w-4xl text-3xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-            {initialSelectedVenue}
-            <br />
-            <span className="text-sky-300">周辺のホテルを探す</span>
-          </h1>
+              <h1 className="mt-4 text-3xl font-black leading-[1.15] tracking-tight text-white sm:mt-5 sm:text-5xl lg:text-6xl">
+                {initialSelectedVenue}
+                <br />
+                <span className="text-sky-300">周辺のホテル</span>
+              </h1>
 
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-100 sm:text-base">
-            会場からの距離・宿泊料金・口コミを比較して、
-            ライブやイベントの遠征にぴったりのホテルを探せます。
-          </p>
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-100 sm:text-base">
+                会場からの距離・宿泊料金・口コミを比較して、
+                ライブやイベントの遠征に便利なホテルを探せます。
+              </p>
 
-          {currentVenue?.address && (
-            <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-white/90">
-              <span aria-hidden="true">📍</span>
-              <span>
-                {currentVenue.prefecture ? `${currentVenue.prefecture} ` : ''}
-                {currentVenue.address}
-              </span>
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* 検索フォーム */}
-      <section
-        id="hotel-search"
-        className="scroll-mt-28 relative z-10 mx-auto -mt-6 max-w-7xl px-4 sm:px-6 lg:px-8"
-      >
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:p-7">
-          <p className="text-sm font-bold tracking-widest text-blue-700">
-            HOTEL SEARCH
-          </p>
-          <h2 className="mt-1 text-xl font-black sm:text-2xl">
-            会場周辺のホテルを探す
-          </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            会場と検索範囲を選択してください。
-          </p>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-[minmax(0,1.6fr)_minmax(180px,1fr)_auto] md:items-end">
-            <div>
-              <label htmlFor="venue" className="mb-2 block text-sm font-bold">
-                📍 ライブ・イベント会場
-              </label>
-              <select
-                id="venue"
-                value={selectedVenue}
-                onChange={(event) => setSelectedVenue(event.target.value)}
-                disabled={venues.length === 0 || loading}
-                className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
-              >
-                <option value="">会場を選択してください</option>
-                {venueGroups.map((group) => (
-                  <optgroup key={group.prefecture} label={group.prefecture}>
-                    {group.venues.map((venue) => (
-                      <option key={venue.id} value={venue.name}>
-                        {venue.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
+              {currentVenue?.address && (
+                <p className="mt-4 flex max-w-2xl items-start gap-2 text-sm leading-6 text-white/90">
+                  <span aria-hidden="true">📍</span>
+                  <span>
+                    {currentVenue.prefecture
+                      ? `${currentVenue.prefecture} `
+                      : ''}
+                    {currentVenue.address}
+                  </span>
+                </p>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="radius" className="mb-2 block text-sm font-bold">
-                🗺️ 会場からの検索範囲
-              </label>
-              <select
-                id="radius"
-                value={radius}
-                onChange={(event) => setRadius(Number(event.target.value))}
-                disabled={loading}
-                className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
-              >
-                <option value={1000}>1km以内</option>
-                <option value={3000}>3km以内</option>
-                <option value={5000}>5km以内</option>
-              </select>
-            </div>
-
-            <button
-              type="button"
-              onClick={searchHotels}
-              disabled={loading || !selectedVenue}
-              className="min-h-12 rounded-xl bg-blue-700 px-7 py-3 font-extrabold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-50"
+            <div
+              id="hotel-search"
+              className="scroll-mt-24 rounded-2xl border border-white/20 bg-white/95 p-4 shadow-2xl backdrop-blur sm:scroll-mt-28 sm:rounded-3xl sm:p-7"
             >
-              {loading ? '検索しています…' : 'ホテルを検索する →'}
-            </button>
+              <p className="text-xs font-black tracking-[0.18em] text-blue-700">
+                HOTEL SEARCH
+              </p>
+
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
+                会場周辺のホテルを探す
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                会場と検索範囲を選択してください。
+              </p>
+
+              <div className="mt-5 space-y-4">
+                <div>
+                  <label
+                    htmlFor="venue"
+                    className="mb-2 block text-sm font-bold text-slate-700"
+                  >
+                    📍 ライブ・イベント会場
+                  </label>
+
+                  <select
+                    id="venue"
+                    value={selectedVenue}
+                    onChange={(event) => setSelectedVenue(event.target.value)}
+                    disabled={venues.length === 0 || loading}
+                    className="min-h-14 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
+                  >
+                    <option value="">会場を選択してください</option>
+                    {venueGroups.map((group) => (
+                      <optgroup
+                        key={group.prefecture}
+                        label={group.prefecture}
+                      >
+                        {group.venues.map((venue) => (
+                          <option key={venue.id} value={venue.name}>
+                            {venue.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <p className="mb-2 text-sm font-bold text-slate-700">
+                    🗺️ 会場からの検索範囲
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1000, 3000, 5000].map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setRadius(value)}
+                        disabled={loading}
+                        className={`min-h-12 rounded-xl border px-3 py-3 text-sm font-extrabold transition ${
+                          radius === value
+                            ? 'border-blue-700 bg-blue-700 text-white shadow-sm'
+                            : 'border-slate-300 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50'
+                        }`}
+                      >
+                        {value / 1000}km以内
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={searchHotels}
+                  disabled={loading || !selectedVenue}
+                  className="flex min-h-14 w-full items-center justify-center rounded-xl bg-blue-700 px-7 py-3 text-base font-extrabold text-white shadow-md transition hover:bg-blue-800 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {loading
+                    ? '検索しています…'
+                    : '🔎 この会場のホテルを検索'}
+                </button>
+              </div>
+
+              <p className="mt-4 text-center text-xs leading-5 text-slate-400">
+                距離・料金・口コミからホテルを比較できます
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 検索結果 */}
       <section
         aria-busy={loading}
         className="mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pt-14 lg:px-8"
@@ -316,24 +390,10 @@ export default function VenueDetailClient({
             <p className="text-sm font-bold tracking-widest text-blue-700">
               HOTELS NEAR THE VENUE
             </p>
+
             <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
               {initialSelectedVenue}周辺のホテル
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              {initialSelectedVenue}から{initialRadius / 1000}km以内に
-              <strong className="mx-1 text-slate-900">{initialHotels.length}件</strong>
-              のホテルが見つかっています。
-              {lowestPrice !== null && (
-                <>
-                  最低料金の目安は
-                  <strong className="mx-1 text-slate-900">
-                    {lowestPrice.toLocaleString('ja-JP')}円〜
-                  </strong>
-                  です。
-                </>
-              )}
-              料金や空室状況は宿泊日・プランによって変わります。予約サイトで最新情報をご確認ください。
-            </p>
           </div>
 
           <p className="shrink-0 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800">
@@ -341,44 +401,136 @@ export default function VenueDetailClient({
           </p>
         </div>
 
-        {/* 並び替えショートカット */}
-        <div className="mt-6 flex flex-wrap gap-2" aria-label="ホテルの並び替え">
-          <button
-            type="button"
-            onClick={() => setSortMode('distance')}
-            aria-pressed={sortMode === 'distance'}
-            className={`rounded-full border px-4 py-2.5 text-sm font-bold transition ${
-              sortMode === 'distance'
-                ? 'border-blue-700 bg-blue-700 text-white'
-                : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300'
-            }`}
-          >
-            📍 会場から近い
-          </button>
-          <button
-            type="button"
-            onClick={() => setSortMode('price')}
-            aria-pressed={sortMode === 'price'}
-            className={`rounded-full border px-4 py-2.5 text-sm font-bold transition ${
-              sortMode === 'price'
-                ? 'border-blue-700 bg-blue-700 text-white'
-                : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300'
-            }`}
-          >
-            💴 料金が安い
-          </button>
-          <button
-            type="button"
-            onClick={() => setSortMode('rating')}
-            aria-pressed={sortMode === 'rating'}
-            className={`rounded-full border px-4 py-2.5 text-sm font-bold transition ${
-              sortMode === 'rating'
-                ? 'border-blue-700 bg-blue-700 text-white'
-                : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300'
-            }`}
-          >
-            ⭐ 口コミ評価が高い
-          </button>
+        {/* Venue overview */}
+        <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-100 px-4 py-3 sm:px-5">
+            <h3 className="flex items-center gap-2 text-lg font-black text-slate-900 sm:text-xl">
+              <span aria-hidden="true">🏢</span>
+              {initialSelectedVenue}について
+            </h3>
+          </div>
+
+          <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[250px_minmax(0,1fr)_360px] lg:items-stretch">
+            {/* Venue image */}
+            <div className="relative min-h-[160px] overflow-hidden rounded-xl bg-slate-100 sm:min-h-[180px]">
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url('${venueHeroImage}')` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/15 to-transparent" />
+            </div>
+
+            {/* Venue basic information */}
+            <div className="flex min-w-0 flex-col justify-center gap-4 py-1">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
+                  📍
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-500">
+                    住所
+                  </p>
+                  <p className="mt-1 text-sm font-semibold leading-6 text-slate-800">
+                    {currentVenue?.address
+                      ? `${currentVenue.prefecture ? `${currentVenue.prefecture} ` : ''}${currentVenue.address}`
+                      : '情報なし'}
+                  </p>
+                </div>
+              </div>
+
+              {currentVenue?.prefecture && (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
+                    🗾
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-500">
+                      エリア
+                    </p>
+                    <p className="mt-1 text-sm font-semibold leading-6 text-slate-800">
+                      {currentVenue.prefecture}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Search summary cards */}
+            <div className="grid grid-cols-3 gap-2 lg:gap-3">
+              <div className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-blue-100 bg-blue-50 px-2 py-4 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xl shadow-sm">
+                  🗺️
+                </div>
+
+                <p className="mt-3 text-xs font-bold leading-5 text-slate-600">
+                  検索範囲
+                </p>
+
+                <p className="mt-1 whitespace-nowrap text-xl font-black text-blue-700 sm:text-2xl">
+                  {initialRadius / 1000}
+                  <span className="ml-0.5 text-sm">km</span>
+                </p>
+              </div>
+
+              <div className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-sky-100 bg-sky-50 px-2 py-4 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xl shadow-sm">
+                  🏨
+                </div>
+
+                <p className="mt-3 text-xs font-bold leading-5 text-slate-600">
+                  周辺ホテル
+                </p>
+
+                <p className="mt-1 whitespace-nowrap text-xl font-black text-sky-700 sm:text-2xl">
+                  {initialHotels.length}
+                  <span className="ml-0.5 text-sm">件</span>
+                </p>
+              </div>
+
+              <div className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-rose-100 bg-rose-50 px-2 py-4 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xl shadow-sm">
+                  💴
+                </div>
+
+                <p className="mt-3 text-xs font-bold leading-5 text-slate-600">
+                  最低料金
+                </p>
+
+                <p className="mt-1 break-words text-lg font-black leading-tight text-rose-700 sm:text-xl">
+                  {lowestPrice !== null
+                    ? `${lowestPrice.toLocaleString('ja-JP')}円〜`
+                    : '情報なし'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div
+          className="mt-6 flex flex-wrap gap-2"
+          aria-label="ホテルの並び替え"
+        >
+          {[
+            ['distance', '📍 会場から近い'],
+            ['price', '💴 料金が安い'],
+            ['rating', '⭐ 口コミ評価が高い'],
+          ].map(([mode, label]) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setSortMode(mode as SortMode)}
+              aria-pressed={sortMode === mode}
+              className={`rounded-full border px-4 py-2.5 text-sm font-bold transition ${
+                sortMode === mode
+                  ? 'border-blue-700 bg-blue-700 text-white'
+                  : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         {sortedHotels.length === 0 ? (
@@ -398,8 +550,8 @@ export default function VenueDetailClient({
                 key={hotel.hotel_id}
                 className="group h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
               >
-                <div className="grid h-full sm:grid-cols-[180px_minmax(0,1fr)]">
-                  <div className="relative min-h-48 overflow-hidden bg-slate-100 sm:min-h-[320px]">
+                <div className="grid h-full sm:grid-cols-[200px_minmax(0,1fr)]">
+                  <div className="relative min-h-52 overflow-hidden bg-slate-100 sm:min-h-[320px]">
                     {hotel.hotel_image_url ? (
                       <img
                         src={hotel.hotel_image_url}
@@ -408,7 +560,7 @@ export default function VenueDetailClient({
                         className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="flex h-full min-h-48 items-center justify-center text-4xl text-slate-300">
+                      <div className="flex h-full min-h-52 items-center justify-center text-4xl text-slate-300">
                         🏨
                       </div>
                     )}
@@ -418,6 +570,7 @@ export default function VenueDetailClient({
                     <p className="text-xs font-bold tracking-widest text-blue-700">
                       HOTEL
                     </p>
+
                     <h3 className="mt-2 break-words text-lg font-extrabold leading-7 text-slate-900">
                       {hotel.hotel_name}
                     </h3>
@@ -436,24 +589,30 @@ export default function VenueDetailClient({
                           )}
                         </div>
                       ) : (
-                        <p className="text-sm text-slate-500">口コミ情報なし</p>
+                        <p className="text-sm text-slate-500">
+                          口コミ情報なし
+                        </p>
                       )}
 
                       {hotel.review_updated_at && (
                         <p className="mt-1 text-xs text-slate-400">
-                          口コミ更新日：{hotel.review_updated_at.replace(/-/g, '/')}
+                          口コミ更新日：
+                          {hotel.review_updated_at.replace(/-/g, '/')}
                         </p>
                       )}
                     </div>
 
-                    <div className="mt-4 rounded-xl bg-slate-50 p-3">
+                    <div className="mt-4 rounded-xl bg-blue-50/70 p-3">
                       <p className="text-xs font-medium text-slate-500">
                         楽天トラベルでの最低料金（目安）
                       </p>
+
                       {hotel.price_min != null && hotel.price_min > 0 ? (
                         <p className="mt-1 text-2xl font-black text-blue-700">
                           {hotel.price_min.toLocaleString('ja-JP')}
-                          <span className="ml-1 text-sm font-bold">円〜</span>
+                          <span className="ml-1 text-sm font-bold">
+                            円〜
+                          </span>
                         </p>
                       ) : (
                         <p className="mt-1 text-sm font-semibold text-slate-500">
@@ -465,8 +624,9 @@ export default function VenueDetailClient({
                     <p className="mt-3 text-sm leading-6 text-slate-600">
                       {hotel.address}
                     </p>
-                    <p className="mt-2 text-sm font-bold text-slate-700">
-                      📍 {initialSelectedVenue}から約 {hotel.distance_km}km
+
+                    <p className="mt-3 inline-flex w-fit rounded-full bg-sky-50 px-3 py-1.5 text-sm font-extrabold text-sky-800">
+                      📍 会場から約 {hotel.distance_km}km
                     </p>
 
                     {hotel.affiliate_url ? (
@@ -476,7 +636,7 @@ export default function VenueDetailClient({
                         rel="sponsored noopener noreferrer"
                         className="mt-5 block rounded-xl bg-blue-700 px-5 py-3 text-center font-bold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 sm:mt-auto"
                       >
-                        予約・詳細を見る →
+                        空室・料金を見る →
                       </a>
                     ) : (
                       <div className="mt-5 rounded-xl bg-slate-100 px-5 py-3 text-center text-sm font-semibold text-slate-500">
@@ -490,38 +650,6 @@ export default function VenueDetailClient({
           </div>
         )}
       </section>
-
-      {/* 別の会場への内部リンク */}
-      <section className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-black sm:text-2xl">
-            別の会場からホテルを探す
-          </h2>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {venues
-              .filter((venue) => venue.id !== currentVenue?.id)
-              .map((venue) => (
-                <li key={venue.id}>
-                  <a
-                    href={`/venues/${venue.id}`}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800"
-                  >
-                    <span>{venue.name}周辺のホテル</span>
-                    <span aria-hidden="true">→</span>
-                  </a>
-                </li>
-              ))}
-          </ul>
-          <a
-            href="/venues"
-            className="mt-6 inline-flex rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-700"
-          >
-            会場一覧を見る →
-          </a>
-        </div>
-      </section>
-
-      
-    </main>
+</main>
   )
 }
