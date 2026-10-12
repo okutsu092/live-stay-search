@@ -17,20 +17,67 @@ export default function VenuesContent({ venues }: VenuesProps) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-indigo-50 text-gray-900">
       {/* Header */}
-      <header className="border-b border-white/70 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <a href="/" className="text-xl font-extrabold tracking-tight">
-            🎵 ライブ会場ホテルサーチ
-          </a>
+      {/* Header */}
+<header className="sticky top-0 z-50 border-b border-white/70 bg-white/95 backdrop-blur">
+  <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" className="text-xl font-extrabold tracking-tight">
+      🎵 ライブ会場ホテルサーチ
+    </a>
 
-          <a
-            href="/"
-            className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-          >
-            ホテル検索
-          </a>
-        </div>
-      </header>
+    <nav
+      aria-label="メインナビゲーション"
+      className="flex flex-wrap items-center justify-end gap-2"
+    >
+      <a
+        href="/#hotel-search"
+        className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+      >
+        🔎 ホテル検索
+      </a>
+
+      <a
+        href="/venues"
+        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        ライブ・イベント会場一覧
+      </a>
+
+      <a
+        href="/faq"
+        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        よくある質問
+      </a>
+    </nav>
+  </div>
+</header>
+{/* Breadcrumb */}
+<nav
+  aria-label="パンくずリスト"
+  className="border-b border-slate-100 bg-white"
+>
+  <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+    <ol className="flex items-center gap-2 text-sm text-slate-500">
+      <li>
+        <a
+          href="/"
+          className="transition hover:text-indigo-600"
+        >
+          トップページ
+        </a>
+      </li>
+
+      <li aria-hidden="true">/</li>
+
+      <li
+        aria-current="page"
+        className="font-medium text-slate-800"
+      >
+        ライブ・イベント会場一覧
+      </li>
+    </ol>
+  </div>
+</nav>
 
       {/* Hero */}
       <section className="relative overflow-hidden">

@@ -39,7 +39,7 @@ export default async function HomePage() {
       venues={venues}
       initialSelectedVenue={venues[0]?.name ?? ''}
       initialHotels={[]}
-      initialRadius={3000}
+      initialRadius={5000}
     />
   )
 }

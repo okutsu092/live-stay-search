@@ -85,6 +85,21 @@ export default function HomeClient({
   const venueGroups = groupVenuesByPrefecture(venues)
   const hotels = initialHotels
 
+  const hotelsWithPrice = hotels.filter(
+  (hotel) =>
+    typeof hotel.price_min === 'number' &&
+    hotel.price_min > 0
+)
+
+const lowestPrice =
+  hotelsWithPrice.length > 0
+    ? Math.min(
+        ...hotelsWithPrice.map(
+          (hotel) => hotel.price_min as number
+        )
+      )
+    : null
+
   const currentVenue = venues.find(
     (venue) => venue.name === initialSelectedVenue
   )
@@ -97,7 +112,7 @@ export default function HomeClient({
     if (!venue || loading) return
 
     const destination =
-      radius === 3000
+      radius === 5000
         ? `/venues/${venue.id}`
         : `/venues/${venue.id}?radius=${radius}`
 
@@ -113,98 +128,143 @@ export default function HomeClient({
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+{/* Header */}
+<header className="sticky top-0 z-50 border-b border-white/70 bg-white/95 backdrop-blur">
+  <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" className="text-xl font-extrabold tracking-tight">
+      🎵 ライブ会場ホテルサーチ
+    </a>
+
+    <nav
+      aria-label="メインナビゲーション"
+      className="flex flex-wrap items-center justify-end gap-2"
+    >
+      <a
+        href="/#hotel-search"
+        className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+      >
+        🔎 ホテル検索
+      </a>
+
+      <a
+        href="/venues"
+        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        ライブ・イベント会場一覧
+      </a>
+
+      <a
+        href="/faq"
+        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        よくある質問
+      </a>
+    </nav>
+  </div>
+</header>
+{isVenuePage && (
+  <nav
+    aria-label="パンくずリスト"
+    className="border-b border-slate-100 bg-white"
+  >
+    <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+      <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+        <li>
           <a
             href="/"
-            className="flex min-w-0 items-center gap-2 text-lg font-black tracking-tight text-slate-900 sm:text-xl"
+            className="transition hover:text-indigo-600"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-700 text-xl text-white">
-              ♪
-            </span>
-            <span>
-              ライブ会場
-              <span className="text-blue-700">ホテルサーチ</span>
-            </span>
+            トップページ
           </a>
+        </li>
 
-          <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 md:flex">
-            <a href="/venues" className="transition hover:text-blue-700">
-              会場一覧
-            </a>
-            <a href="#hotel-search" className="transition hover:text-blue-700">
-              ホテルを探す
-            </a>
-            <a href="#venue-info" className="transition hover:text-blue-700">
-              会場情報
-            </a>
-          </nav>
+        <li aria-hidden="true">/</li>
 
+        <li>
           <a
-            href="#hotel-search"
-            className="shrink-0 rounded-full bg-blue-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-800 sm:px-5"
+            href="/venues"
+            className="transition hover:text-indigo-600"
           >
-            ホテル検索
+            ライブ・イベント会場一覧
           </a>
-        </div>
-      </header>
+        </li>
+
+        <li aria-hidden="true">/</li>
+
+        <li
+          aria-current="page"
+          className="font-medium text-slate-800"
+        >
+          {initialSelectedVenue}
+        </li>
+      </ol>
+    </div>
+  </nav>
+)}
+
+{/* HomeClient内のSearch Boxのdivには id="hotel-search" を追加 */}
+<div
+  id="hotel-search"
+    className="relative mt-6 max-w-3xl scroll-mt-24 rounded-3xl bg-white/95 p-6 shadow-2xl ring-1 ring-white/80 backdrop-blur sm:p-7"
+>
+  {/* 既存の検索窓の中身はそのまま */}
+</div>
 
       {/* Hero */}
-      <section className="relative isolate overflow-hidden bg-slate-950">
-        <div
-          className="absolute inset-0 -z-20 bg-cover bg-center"
-          style={{
-            backgroundImage: "url('/hero-concert.png')",
-          }}
-        />
+<section className="relative isolate overflow-hidden bg-slate-950">
+  <div
+    className="absolute inset-0 -z-20 bg-cover bg-center"
+    style={{
+      backgroundImage: "url('/hero-concert.png')",
+    }}
+  />
 
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-blue-950/45" />
+  <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-blue-950/45" />
 
-        <div className="mx-auto max-w-7xl px-4 pb-24 pt-16 sm:px-6 sm:pb-28 sm:pt-24 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
-              <span aria-hidden="true">♪</span>
-              ライブ・イベント遠征のホテル探し
-            </p>
+  <div className="mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">
+    <div className="max-w-3xl">
+      <p className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
+        <span aria-hidden="true">♪</span>
+        ライブ・イベント遠征のホテル探し
+      </p>
 
-            <h1 className="mt-6 text-3xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-              {isVenuePage ? (
-                <>
-                  {initialSelectedVenue}
-                  <br />
-                  <span className="text-sky-300">
-                    周辺のホテルを探す
-                  </span>
-                </>
-              ) : (
-                <>
-                  ライブの日は、
-                  <br />
-                  <span className="text-sky-300">
-                    会場の近くに泊まろう。
-                  </span>
-                </>
-              )}
-            </h1>
+      <h1 className="mt-4 text-3xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+        {isVenuePage ? (
+          <>
+            {initialSelectedVenue}
+            <br />
+            <span className="text-sky-300">
+              周辺のホテルを探す
+            </span>
+          </>
+        ) : (
+          <>
+            ライブの日は、
+            <br />
+            <span className="text-sky-300">
+              会場の近くに泊まろう。
+            </span>
+          </>
+        )}
+      </h1>
 
-            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-100 sm:text-lg">
-              ライブやイベントの会場を選ぶだけ。
-              <br className="hidden sm:block" />
-              会場からの距離や口コミ、料金を比較して、
-              <br className="hidden sm:block" />
-              遠征にぴったりのホテルを探せます。
-            </p>
+      <p className="mt-4 max-w-2xl text-base leading-8 text-slate-100 sm:text-lg">
+        ライブやイベントの会場を選ぶだけ。
+        <br className="hidden sm:block" />
+        会場からの距離や口コミ、料金を比較して、
+        <br className="hidden sm:block" />
+        遠征にぴったりのホテルを探せます。
+      </p>
 
-            {isVenuePage && currentVenue?.address && (
-              <p className="mt-5 flex items-start gap-2 text-sm leading-6 text-white/90">
-                <span aria-hidden="true">📍</span>
-                <span>{currentVenue.address}</span>
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      {isVenuePage && currentVenue?.address && (
+        <p className="mt-3 flex items-start gap-2 text-sm leading-6 text-white/90">
+          <span aria-hidden="true">📍</span>
+          <span>{currentVenue.address}</span>
+        </p>
+      )}
+    </div>
+  </div>
+</section>
 
       {/* Search form */}
       <section
@@ -315,9 +375,26 @@ export default function HomeClient({
                 <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
                   {initialSelectedVenue}周辺のホテル
                 </h2>
-                <p className="mt-2 text-sm text-slate-500">
-                  会場からの距離や口コミ、料金を比較できます。
-                </p>
+                {selectedVenue && !loading && hotels.length > 0 && (
+  <p className="mt-3 max-w-3xl text-sm leading-7 text-gray-600">
+    現在、{selectedVenue}から{radius / 1000}km以内に
+    <strong className="mx-1 text-gray-900">
+      {hotels.length}件
+    </strong>
+    のホテルが見つかっています。
+    {lowestPrice !== null && (
+      <>
+        最低料金の目安は
+        <strong className="mx-1 text-gray-900">
+          {lowestPrice.toLocaleString()}円〜
+        </strong>
+        です。
+      </>
+    )}
+    料金・空室状況は宿泊日やプランによって変動するため、
+    予約サイトで最新情報をご確認ください。
+  </p>
+)}
               </div>
 
               <p className="rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800">
@@ -450,47 +527,7 @@ export default function HomeClient({
             )}
           </section>
 
-          {/* Venue information */}
-          {currentVenue && (
-            <section
-              id="venue-info"
-              className="border-y border-slate-200 bg-white"
-            >
-              <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <p className="text-sm font-bold tracking-widest text-blue-700">
-                  VENUE INFORMATION
-                </p>
-                <h2 className="mt-2 text-2xl font-black sm:text-3xl">
-                  {currentVenue.name}の会場情報
-                </h2>
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-xl border border-slate-200 p-5">
-                    <p className="text-sm font-bold text-slate-500">
-                      所在地
-                    </p>
-                    <p className="mt-2 leading-7 text-slate-800">
-                      {currentVenue.address || '住所情報は準備中です。'}
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl border border-slate-200 p-5">
-                    <p className="text-sm font-bold text-slate-500">
-                      都道府県
-                    </p>
-                    <p className="mt-2 text-lg font-bold text-slate-800">
-                      {currentVenue.prefecture || '情報なし'}
-                    </p>
-                  </div>
-                </div>
-
-                <p className="mt-5 text-sm leading-7 text-slate-500">
-                  会場周辺のホテルは、上の一覧で距離・口コミ・料金を比較できます。
-                  最寄り駅や詳しいアクセス情報は、確認できるデータを準備してから掲載します。
-                </p>
-              </div>
-            </section>
-          )}
         </>
       )}
 
