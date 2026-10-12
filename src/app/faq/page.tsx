@@ -76,73 +76,141 @@ export default function FaqPage() {
   )
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-indigo-50 text-gray-900">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: faqJsonLdString,
         }}
       />
-
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white/70 bg-white/95 backdrop-blur">
-  <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-    <a href="/" className="text-xl font-extrabold tracking-tight">
-      🎵 ライブ会場ホテルサーチ
-    </a>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <a
+            href="/"
+            className="min-w-0 shrink text-base font-extrabold tracking-tight sm:text-xl"
+          >
+            <span className="sm:hidden">🎵 ライブ会場ホテル</span>
+            <span className="hidden sm:inline">🎵 ライブ会場ホテルサーチ</span>
+          </a>
 
-    <nav
-      aria-label="メインナビゲーション"
-      className="flex flex-wrap items-center justify-end gap-2"
-    >
-      <a
-        href="/#hotel-search"
-        className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+          {/* Desktop navigation */}
+          <nav
+            aria-label="メインナビゲーション"
+            className="hidden items-center justify-end gap-2 md:flex"
+          >
+            <a
+              href="/#hotel-search"
+              className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-lg"
+            >
+              🔎 ホテル検索
+            </a>
+
+            <a
+              href="/venues"
+              className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+            >
+              ライブ・イベント会場一覧
+            </a>
+
+            <a
+              href="/faq" aria-current="page"
+              className="rounded-full bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-700"
+            >
+              よくある質問
+            </a>
+          </nav>
+
+          {/* Mobile navigation */}
+          <div className="flex shrink-0 items-center gap-2 md:hidden">
+            <a
+              href="/#hotel-search"
+              className="inline-flex min-h-10 items-center justify-center rounded-full bg-indigo-600 px-3 py-2 text-xs font-extrabold text-white shadow-sm"
+            >
+              🔎 ホテル検索
+            </a>
+
+            <details className="relative">
+              <summary
+                aria-label="メニューを開く"
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white text-xl font-bold text-slate-700 shadow-sm"
+              >
+                ☰
+              </summary>
+
+              <div className="absolute right-0 top-12 z-[60] w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                <a
+                  href="/venues"
+                  className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  ライブ・イベント会場一覧
+                </a>
+
+                <a
+                  href="/faq"
+                  className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  よくある質問
+                </a>
+              </div>
+            </details>
+          </div>
+        </div>
+      </header>
+
+      {/* Breadcrumb */}
+      <nav
+        aria-label="パンくずリスト"
+        className="border-b border-slate-100 bg-white"
       >
-        🔎 ホテル検索
-      </a>
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+            <li>
+              <a
+                href="/"
+                className="transition hover:text-indigo-600"
+              >
+                トップページ
+              </a>
+            </li>
 
-      <a
-        href="/venues"
-        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-      >
-        ライブ・イベント会場一覧
-      </a>
+            <li aria-hidden="true">/</li>
 
-      <a
-        href="/faq"
-        className="rounded-full px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-      >
-        よくある質問
-      </a>
-    </nav>
-  </div>
-</header>
+            <li
+              aria-current="page"
+              className="font-medium text-slate-800"
+            >
+              よくある質問
+            </li>
+          </ol>
+        </div>
+      </nav>
 
-      {/* TOPと同じイメージのMV。検索窓は表示しない */}
-      <section className="relative overflow-hidden">
+      {/* Hero */}
+      <section className="relative isolate overflow-hidden bg-slate-950">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 -z-20 bg-cover bg-center"
           style={{
             backgroundImage: "url('/hero-concert.png')",
           }}
         />
 
-        <div className="absolute inset-0 bg-white/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/35 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-slate-950/25" />
 
-        <div className="relative mx-auto max-w-6xl px-6 pb-12 pt-10 sm:pb-14 sm:pt-12">
+        <div className="mx-auto max-w-7xl px-4 pb-12 pt-9 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8">
           <div className="max-w-3xl">
-            <p className="mb-3 inline-flex rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-indigo-600 shadow-sm backdrop-blur">
-              🎫 ライブ会場ホテルサーチ
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
+              <span aria-hidden="true">?</span>
+              FAQ
             </p>
 
-            <h1 className="text-4xl font-black leading-tight tracking-tight text-gray-900 drop-shadow-sm sm:text-6xl">
+            <h1 className="mt-4 text-3xl font-black leading-[1.15] tracking-tight text-white sm:mt-5 sm:text-5xl lg:text-6xl">
               よくある質問
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base font-medium leading-8 text-gray-700 sm:text-lg">
-              ホテルの探し方や料金・口コミの見方、
+            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-100 sm:text-lg">
+              ホテルの探し方や検索範囲、料金・口コミの見方など、
+              <br className="hidden sm:block" />
               ライブ遠征時のホテル選びについてご案内します。
             </p>
           </div>
@@ -150,9 +218,13 @@ export default function FaqPage() {
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto w-full max-w-4xl px-6 py-12 sm:py-16">
+      <section className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6 sm:py-16">
         <div className="mb-8">
-          <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">
+          <p className="text-sm font-bold tracking-widest text-blue-700">
+            GUIDE & FAQ
+          </p>
+
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
             サイトの使い方・ホテル検索について
           </h2>
 
@@ -166,14 +238,14 @@ export default function FaqPage() {
           {faqs.map((faq) => (
             <details
               key={faq.question}
-              className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+              className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md sm:p-6"
             >
               <summary className="cursor-pointer list-none font-bold text-slate-900">
                 <span className="flex items-start justify-between gap-4">
                   <span>{faq.question}</span>
                   <span
                     aria-hidden="true"
-                    className="text-xl leading-none text-indigo-600 transition group-open:rotate-45"
+                    className="text-xl leading-none text-blue-700 transition group-open:rotate-45"
                   >
                     ＋
                   </span>
@@ -187,32 +259,50 @@ export default function FaqPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl bg-indigo-50 p-6">
-          <h2 className="text-lg font-bold text-slate-900">
+        <div className="mt-10 rounded-2xl border border-blue-100 bg-blue-50 p-6 sm:p-7">
+          <p className="text-xs font-black tracking-[0.18em] text-blue-700">
+            HOTEL SEARCH
+          </p>
+
+          <h2 className="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
             会場周辺のホテルを探す
           </h2>
 
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            会場ごとのページでは、距離・最低料金・口コミを確認しながら周辺ホテルを比較できます。
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            会場ごとのページでは、距離・最低料金・口コミを確認しながら
+            周辺ホテルを比較できます。
           </p>
 
           <div className="mt-5 flex flex-wrap gap-3">
             <a
               href="/#hotel-search"
-              className="rounded-full bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700"
+              className="inline-flex min-w-[170px] items-center justify-center rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-800 hover:shadow-md"
             >
-              ホテル検索
+              🔎 ホテル検索
             </a>
 
             <a
               href="/venues"
-              className="rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
             >
               ライブ・イベント会場一覧を見る
             </a>
           </div>
         </div>
       </section>
+
+      <footer className="bg-slate-950 px-6 py-8 text-center text-sm text-slate-400">
+        <a
+          href="/"
+          className="font-bold text-white transition hover:text-sky-300"
+        >
+          ライブ会場ホテルサーチ
+        </a>
+
+        <p className="mt-3">
+          © ライブ会場ホテルサーチ
+        </p>
+      </footer>
     </main>
   )
 }
