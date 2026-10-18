@@ -217,6 +217,36 @@ export default async function VenuePage({
         initialRadius={initialRadius}
       />
 
+      {/* 公式サイト：ホテル一覧とFAQの間 */}
+      <section
+        aria-labelledby="venue-official-heading"
+        className="mx-auto w-full max-w-7xl px-4 pt-8"
+      >
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
+          <h2
+            id="venue-official-heading"
+            className="text-xl font-bold text-slate-900"
+          >
+            {venue.name}公式サイト
+          </h2>
+          {venue.official_url?.trim() && /^https?:\/\//i.test(venue.official_url.trim()) ? (
+            <a
+              href={venue.official_url.trim()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block max-w-full break-all text-sm font-semibold leading-7 text-blue-700 underline underline-offset-4 transition hover:text-blue-900"
+            >
+              {venue.official_url.trim()}
+              <span className="sr-only">（新しいタブで開きます）</span>
+            </a>
+          ) : (
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              {venue.name}公式サイトの情報は準備中です。
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* 会場別FAQ：画面上にも表示 */}
       <section
         id="venue-faq"
