@@ -9,6 +9,9 @@ export type Venue = {
   name: string
   prefecture: string | null
   address: string | null
+  nearest_station_access: string | null
+  official_url: string | null
+  max_capacity: number | null
 }
 
 export type Hotel = {
@@ -485,22 +488,47 @@ export default function VenueDetailClient({
                 </div>
               </div>
 
-              {currentVenue?.prefecture && (
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
-                    🗾
-                  </div>
-
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-500">
-                      エリア
-                    </p>
-                    <p className="mt-1 text-sm font-semibold leading-6 text-slate-800">
-                      {currentVenue.prefecture}
-                    </p>
-                  </div>
+              <div className="flex items-start gap-3">
+                <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
+                  🚉
                 </div>
-              )}
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-500">最寄り駅</p>
+                  <p className="mt-1 whitespace-pre-line break-words text-sm font-semibold leading-6 text-slate-800">{currentVenue?.nearest_station_access?.trim() || '情報なし'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
+                  🔗
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-500">公式サイト</p>
+                  {currentVenue?.official_url?.trim() && /^https?:\/\//i.test(currentVenue.official_url.trim()) ? (
+                      <a
+                        href={currentVenue.official_url.trim()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block break-all text-sm font-semibold leading-6 text-blue-700 underline underline-offset-4 transition hover:text-blue-900"
+                      >
+                        {currentVenue.official_url.trim()}
+                        <span className="sr-only">（新しいタブで開きます）</span>
+                      </a>
+                    ) : (
+                      <p className="mt-1 text-sm font-semibold leading-6 text-slate-800">情報なし</p>
+                    )}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
+                  👥
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-500">最大キャパ</p>
+                  <p className="mt-1 whitespace-pre-line break-words text-sm font-semibold leading-6 text-slate-800">{currentVenue?.max_capacity != null ? `${currentVenue.max_capacity.toLocaleString('ja-JP')}人` : '情報なし'}</p>
+                </div>
+              </div>
             </div>
 
             {/* Search summary cards */}
