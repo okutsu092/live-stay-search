@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next'
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
@@ -34,7 +33,7 @@ const getVenue = cache(async (id: string): Promise<Venue | null> => {
 
   const { data, error } = await supabase
     .from('venues')
-    .select('id, name, prefecture, address')
+    .select('id, name, prefecture, address, nearest_station_access, official_url, max_capacity')
     .eq('id', venueId)
     .limit(1)
     .returns<Venue[]>()
@@ -95,7 +94,7 @@ export default async function VenuePage({
 
   const { data: venueData, error: venueError } = await supabase
     .from('venues')
-    .select('id, name, prefecture, address')
+    .select('id, name, prefecture, address, nearest_station_access, official_url, max_capacity')
     .order('name')
     .returns<Venue[]>()
 
@@ -296,14 +295,14 @@ export default async function VenuePage({
         </div>
       </section>
       <footer className="bg-slate-950 px-4 py-8 text-center text-sm text-slate-400">
-  <a
-    href="/"
-    className="font-bold text-white transition hover:text-sky-300"
-  >
-    ライブ会場ホテルサーチ
-  </a>
-  <p className="mt-3">© ライブ会場ホテルサーチ</p>
-</footer>
+        <a
+          href="/"
+          className="font-bold text-white transition hover:text-sky-300"
+        >
+          ライブ会場ホテルサーチ
+        </a>
+        <p className="mt-3">© ライブ会場ホテルサーチ</p>
+      </footer>
     </>
   )
 }
