@@ -500,28 +500,6 @@ export default function VenueDetailClient({
 
               <div className="flex items-start gap-3">
                 <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
-                  🔗
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-500">公式サイト</p>
-                  {currentVenue?.official_url?.trim() && /^https?:\/\//i.test(currentVenue.official_url.trim()) ? (
-                      <a
-                        href={currentVenue.official_url.trim()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 block break-all text-sm font-semibold leading-6 text-blue-700 underline underline-offset-4 transition hover:text-blue-900"
-                      >
-                        {currentVenue.official_url.trim()}
-                        <span className="sr-only">（新しいタブで開きます）</span>
-                      </a>
-                    ) : (
-                      <p className="mt-1 text-sm font-semibold leading-6 text-slate-800">情報なし</p>
-                    )}
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">
                   👥
                 </div>
                 <div className="min-w-0">
