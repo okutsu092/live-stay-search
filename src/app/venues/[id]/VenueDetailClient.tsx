@@ -12,6 +12,7 @@ export type Venue = {
   nearest_station_access: string | null
   official_url: string | null
   max_capacity: number | null
+  venue_image_url: string | null
 }
 
 export type Hotel = {
@@ -36,7 +37,7 @@ type Props = {
 
 type SortMode = 'distance' | 'price' | 'rating'
 
-const VENUE_HERO_IMAGES: Record<number, string> = {}
+const DEFAULT_VENUE_IMAGE = "/hero-concert.png"
 
 function ReviewStars({ rating }: { rating: number }) {
   const safeRating = Math.max(0, Math.min(5, rating))
@@ -85,8 +86,7 @@ export default function VenueDetailClient({
   )
 
   const venueHeroImage =
-    (currentVenue && VENUE_HERO_IMAGES[currentVenue.id]) ||
-    '/hero-concert.png'
+    currentVenue?.venue_image_url?.trim() || DEFAULT_VENUE_IMAGE
 
   const sortedHotels = useMemo(() => {
     const result = [...initialHotels]
@@ -192,10 +192,19 @@ export default function VenueDetailClient({
         : `/venues/${venue.id}?radius=${radius}`
 
     const currentUrl = window.location.pathname + window.location.search
-    if (currentUrl === destination) return
+    if (currentUrl === destination) {
+      window.history.replaceState(null, '', `${destination}#hotel-results`)
+      document.getElementById('hotel-results')?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
+        block: 'start',
+      })
+      return
+    }
 
     startTransition(() => {
-      router.push(destination)
+      router.push(`${destination}#hotel-results`)
     })
   }
 
@@ -306,7 +315,7 @@ export default function VenueDetailClient({
       <section className="relative isolate overflow-hidden bg-slate-950">
         <div
           className="absolute inset-0 -z-20 bg-cover bg-center"
-          style={{ backgroundImage: `url('${venueHeroImage}')` }}
+          style={{ backgroundImage: `url(${JSON.stringify(venueHeroImage)})` }}
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-slate-950/25" />
 
@@ -438,7 +447,10 @@ export default function VenueDetailClient({
         aria-busy={loading}
         className="mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pt-14 lg:px-8"
       >
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div
+          id="hotel-results"
+          className="scroll-mt-24 flex flex-col justify-between gap-4 sm:scroll-mt-28 sm:flex-row sm:items-end"
+        >
           <div>
             <p className="text-sm font-bold tracking-widest text-blue-700">
               HOTELS NEAR THE VENUE
@@ -464,7 +476,7 @@ export default function VenueDetailClient({
             <div className="relative min-h-[200px] overflow-hidden rounded-xl bg-slate-100 sm:min-h-[220px] lg:min-h-[240px]">
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url('${venueHeroImage}')` }}
+                style={{ backgroundImage: `url(${JSON.stringify(venueHeroImage)})` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/15 to-transparent" />
             </div>
