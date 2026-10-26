@@ -33,7 +33,7 @@ const getVenue = cache(async (id: string): Promise<Venue | null> => {
 
   const { data, error } = await supabase
     .from('venues')
-    .select('id, name, prefecture, address, nearest_station_access, official_url, max_capacity')
+    .select('id, name, prefecture, address, nearest_station_access, official_url, max_capacity, venue_image_url')
     .eq('id', venueId)
     .limit(1)
     .returns<Venue[]>()
@@ -94,7 +94,7 @@ export default async function VenuePage({
 
   const { data: venueData, error: venueError } = await supabase
     .from('venues')
-    .select('id, name, prefecture, address, nearest_station_access, official_url, max_capacity')
+    .select('id, name, prefecture, address, nearest_station_access, official_url, max_capacity, venue_image_url')
     .order('name')
     .returns<Venue[]>()
 
